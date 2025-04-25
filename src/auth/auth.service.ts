@@ -30,7 +30,7 @@ export class AuthService {
     return { message: 'Email verified successfully' };
   }
 
-  //Login with Email
+  //Validate with Email
   private async validateByEmail(email: string, password: string) {
     const user = await this.usersService.findByEmail(email);
     if (user && await bcrypt.compare(password, user.password)) {
@@ -40,7 +40,7 @@ export class AuthService {
     return null;
   }
 
-  //Login with username
+  //Validate Login with username
   private async validateByUsername(username: string, password: string) {
     const user = await this.usersService.findByUsername(username);
     if (user && await bcrypt.compare(password, user.password)) {
@@ -49,7 +49,8 @@ export class AuthService {
     }
     return null;
   }
-
+  
+  //Check User if user exists in dtb then excute the function below 
   async validateUser(dto: LoginDto) {
     const { email, username, password } = dto;
     let user;
