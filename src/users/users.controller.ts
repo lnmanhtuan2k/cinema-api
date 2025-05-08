@@ -7,7 +7,7 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { ParseUUIDPipe } from '@nestjs/common';
 import { UpdateUserRoleDto } from './dto/update-role.dto';
 
-@Controller('users')
+@Controller('/api/users')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

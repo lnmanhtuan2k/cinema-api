@@ -72,4 +72,30 @@ export class AuthService {
     return { access_token: this.jwtService.sign(payload) };
   }
   
+  // Validate or create user from Google OAuth
+  async validateOrCreateGoogleUser(googleUser: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    picture: string;
+    accessToken: string;
+  }) {
+    let user = await this.usersService.findByEmail(googleUser.email);
+
+    // Check user, create a new user if they don't exist
+    if (!user) {
+      user = await this.usersService.createGoogleUser({
+        email: googleUser.email,
+        firstName: googleUser.firstName,
+        lastName: googleUser.lastName,
+        picture: googleUser.picture,
+      });
+    }
+    
+    const payload = { sub: user.id, role: user.role };
+    return { 
+      user,
+      access_token: this.jwtService.sign(payload)
+    };
+  }
 }

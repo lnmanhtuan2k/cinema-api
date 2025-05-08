@@ -5,7 +5,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 
-@Controller('theaters')
+@Controller('/api/theaters')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class TheatersController {
   constructor(private readonly theatersService: TheatersService) {}

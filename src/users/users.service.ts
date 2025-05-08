@@ -101,4 +101,34 @@ export class UsersService {
     if (!user) throw new NotFoundException('User not found');
     return this.prisma.user.delete({ where: { id } });
   }
+
+  // Create a user from Google OAuth
+  async createGoogleUser(userData: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    picture?: string;
+  }) {
+
+    const baseUsername = userData.email.split('@')[0];
+    const randomString = Math.random().toString(36).substring(2, 8);
+    const username = `${baseUsername}_${randomString}`;
+    
+    const randomPassword = uuidv4();
+    const hashedPassword = await bcrypt.hash(randomPassword, 10);
+    
+    // Create the user
+    const user = await this.prisma.user.create({
+      data: {
+        email: userData.email,
+        username: username,
+        password: hashedPassword,
+        name: `${userData.firstName} ${userData.lastName}`,
+        isVerified: true,
+        authProvider: 'GOOGLE',
+      },
+    });
+    
+    return user;
+  }
 }
