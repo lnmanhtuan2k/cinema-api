@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { subject } from '@casl/ability';
 
 @Injectable()
 export class AuthService {
@@ -34,6 +35,9 @@ export class AuthService {
   private async validateByEmail(email: string, password: string) {
     const user = await this.usersService.findByEmail(email);
     if (user && await bcrypt.compare(password, user.password)) {
+      if (!user.isVerified && user.authProvider === 'LOCAL') {
+        throw new UnauthorizedException('Please verify your email before logging in');
+      }
       const { password, ...result } = user;
       return result;
     }
@@ -44,6 +48,9 @@ export class AuthService {
   private async validateByUsername(username: string, password: string) {
     const user = await this.usersService.findByUsername(username);
     if (user && await bcrypt.compare(password, user.password)) {
+      if (!user.isVerified && user.authProvider === 'LOCAL') {
+        throw new UnauthorizedException('Please verify your email before logging in');
+      }
       const { password, ...result } = user;
       return result;
     }
@@ -54,22 +61,36 @@ export class AuthService {
   async validateUser(dto: LoginDto) {
     const { email, username, password } = dto;
     let user;
-    if (email) {
-      user = await this.validateByEmail(email, password);
-    }
-    if (!user && username) {
-      user = await this.validateByUsername(username, password);
-    }
-    if (!user) {
+    try {
+      if (email) {
+        user = await this.validateByEmail(email, password);
+      }
+      if (!user && username) {
+        user = await this.validateByUsername(username, password);
+      }
+      if (!user) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
+      return user;
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
       throw new UnauthorizedException('Invalid credentials');
     }
-    return user;
   }
 
   async login(dto: LoginDto) {
     const user = await this.validateUser(dto);
-    const payload = { sub: user.id, role: user.role };
-    return { access_token: this.jwtService.sign(payload) };
+    const payload = { subject: user.id, role: user.role};
+    return { 
+      access_token: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role
+      }
+    };
   }
   
   // Validate or create user from Google OAuth
@@ -92,7 +113,7 @@ export class AuthService {
       });
     }
     
-    const payload = { sub: user.id, role: user.role };
+    const payload = { subject: user.id, role: user.role };
     return { 
       user,
       access_token: this.jwtService.sign(payload)

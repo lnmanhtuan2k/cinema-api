@@ -45,14 +45,19 @@ model User {
   bookings                    Booking[]
 }
 
-
-
 model Movie {
   id          String      @id @default(uuid()) @db.Uuid
   title       String
   description String
   duration    Int
   showtimes   Showtime[]
+  genres      MovieGenre[]
+  country     Country?    @relation(fields: [countryId], references: [id])
+  countryId   String?     @db.Uuid
+  actors      String[]        
+  directors   String[]
+  ageRating   Int
+  poster      String?
 }
 
 model Theater {
@@ -69,7 +74,6 @@ model Room {
   showtimes Showtime[]
   chairs    Chair[]
 }
-
 
 model Showtime {
   id        String    @id @default(uuid()) @db.Uuid
@@ -95,4 +99,29 @@ model Chair {
   type     ChairType
   room     Room      @relation(fields: [roomId], references: [id])
   roomId   String    @db.Uuid
+}
+
+model Country {
+  id      String    @id @default(uuid()) @db.Uuid
+  name    String    @unique
+  code    String    @unique
+  movies  Movie[]
+}
+
+model Genre {
+  id      String       @id @default(uuid()) @db.Uuid
+  name    String       @unique
+  movies  MovieGenre[]
+}
+
+model MovieGenre {
+  id        String   @id @default(uuid()) @db.Uuid
+  movie     Movie    @relation(fields: [movieId], references: [id])
+  movieId   String   @db.Uuid
+  genre     Genre    @relation(fields: [genreId], references: [id])
+  genreId   String   @db.Uuid
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  @@unique([movieId, genreId])
 }

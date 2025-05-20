@@ -24,9 +24,10 @@ export class AdminSeederService implements OnModuleInit {
                 password: hashed,
                 name: 'System Admin',
                 role: Role.ADMIN,
+                isVerified: true,
             },
         });
 
-        this.logger.log('Admin user ensured: ${email}');
+        this.logger.log(`Admin user ensured: ${email}`);
     }
 }
