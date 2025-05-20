@@ -23,6 +23,7 @@ Backend cho hệ thống quản lý rạp chiếu phim, được xây dựng v�
 - **Validation**: Class-validator
 
 ----- CẤU TRÚC DỰ ÁN -----
+```
 cinema-backend/
 ├── src/
 │   ├── common/           # Guards, decorators, middlewares, utils
@@ -37,6 +38,7 @@ cinema-backend/
 │   └── prisma/           # Prisma service và migrations
 ├── prisma/               # Schema và migrations
     └── schema.prisma     # Database schema
+```
 
 ------ CÁC TÍNH NĂNG CHÍNH -----
 
@@ -86,11 +88,11 @@ cd cinema-backend
 - npm install
 
 3. Tạo file `.env` với nội dung:
-
+```
 DATABASE_URL="postgresql://username:password@localhost:5432/cinema?schema=public"
 JWT_SECRET="your-secret-key"
 JWT_EXPIRATION="1d"
-
+```
 4. Chạy migrations:
 
 npx prisma migrate dev
@@ -126,21 +128,3 @@ http://localhost:3000/api/docs
 - **Manager**: Quản lý phim, lịch chiếu, phòng chiếu
 - **Admin**: Toàn quyền quản lý hệ thống
 
-## 🧪 Testing
-
-```bash
-# Unit tests
-npm run test
-
-# E2E tests
-npm run test:e2e
-
-# Test coverage
-npm run test:cov
-```
-
-## 👏 Đóng góp
-Mọi đóng góp đều được hoan nghênh! Vui lòng tạo issues hoặc pull requests để đóng góp vào dự án.
-
-## 📄 Giấy phép
-MIT
